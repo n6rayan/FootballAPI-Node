@@ -1,6 +1,7 @@
 const express = require('express');
-const mysql = require('./Database/databaseConnection');
 const bodyParser = require('body-parser');
+
+const mysql = require('./database/databaseConnection');
 
 const app = express();
 
@@ -8,6 +9,12 @@ var insertSQL = 'INSERT INTO club (club_id, club_name, location, league, manager
 var selectSQL = 'SELECT * FROM club WHERE club_id=?';
 
 app.use(bodyParser.json());
+app.set('view engine', 'pug');
+
+app.get('/', (req, res) => {
+
+    res.render('index');
+});
 
 app.get('/api/team/:id', (req, res) => {
 
