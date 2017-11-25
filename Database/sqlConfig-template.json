@@ -1,0 +1,19 @@
+{  
+   "devEnvironment":1,
+   "databaseCredentials":{  
+      "devCredentials":{  
+         "host":"localhost",
+         "user":"root",
+         "password":"",
+         "port":"",
+         "database":"footballapi"
+      },
+      "prodCredentials":{  
+         "host":"production db host name will go here", 
+         "user":"production db username will go here",
+         "password":"production db password will go here",
+         "port":0,
+         "database":"production db name will go here"
+      }
+   }
+}
