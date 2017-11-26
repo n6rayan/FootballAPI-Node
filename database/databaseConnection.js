@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 const fs = require('fs');
 
-const info = JSON.parse(fs.readFileSync('./Database/sqlConfig.json', 'UTF-8'));
+const info = JSON.parse(fs.readFileSync('./database/sqlConfig.json', 'UTF-8'));
 
 const host = info.devEnvironment ? info.databaseCredentials.devCredentials.host : info.databaseCredentials.prodCredentials.host;
 const user = info.devEnvironment ? info.databaseCredentials.devCredentials.user : info.databaseCredentials.prodCredentials.user;

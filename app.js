@@ -2,10 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const mysql = require('./database/databaseConnection');
+const id = require('./uniqueID/createUniqueID');
+const unixTime = require('./dateTime/dateTime');
 
 const app = express();
 
-var insertSQL = 'INSERT INTO club (club_id, club_name, location, league, manager, created_by, created_at, stadium_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+var insertSQL = 'INSERT INTO club (club_id, club_name, location, league, manager, stadium, created_by, created_at, stadium_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 var selectSQL = 'SELECT * FROM club WHERE club_id=?';
 
 app.use(bodyParser.json());
@@ -38,14 +40,15 @@ app.post('/api/insertTeam', (req, res) => {
 
     var values = [
 
-        req.body.club_id,
+        id.uniqueID(req.body.club_name),
         req.body.club_name,
         req.body.location,
         req.body.league,
         req.body.manager,
+        req.body.stadium,
         req.body.created_by,
-        Date.now() / 1000,
-        req.body.stadium_id
+        unixTime.epoch(),
+        id.uniqueID(req.body.stadium)
     ];
 
     mysql.query(insertSQL, values, (err, result) => {
@@ -55,6 +58,7 @@ app.post('/api/insertTeam', (req, res) => {
                 "success":0,
                 "message":"Something went wrong."
             });
+            throw err;
         }
         else {
 
@@ -71,4 +75,4 @@ app.listen(3000, function() {
 
     console.log('Server started on port 3000...' + 
         "\nGo to http://127.0.0.1:3000 in the browser to view...");
-})
+});
