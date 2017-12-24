@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mysql = require('./database/databaseConnection');
 const id = require('./uniqueID/createUniqueID');
 const unixTime = require('./dateTime/dateTime');
+const existingTeam = require('./teamManager/teamManager');
 
 const app = express();
 
@@ -14,7 +15,6 @@ app.use(bodyParser.json());
 app.set('view engine', 'pug');
 
 app.get('/', (req, res) => {
-
     res.render('index');
 });
 
@@ -22,16 +22,13 @@ app.get('/api/team/:id', (req, res) => {
 
     mysql.query(selectSQL, req.params.id, (err, result) => {
 
-        if (err) {
+        if (err) throw err;
 
-            res.send({
-                "success":0,
-                "message":"Cannot find a team based off that ID."
-            });
+        if (result.length > 0) {
+            res.send(result)
         }
         else {
-
-            res.send(result)
+            res.send({"isSuccess": 0, "message": "Can't find a team based off that ID."})
         }
     });
 });
@@ -39,7 +36,6 @@ app.get('/api/team/:id', (req, res) => {
 app.post('/api/insertTeam', (req, res) => {
 
     var values = [
-
         id.uniqueID(req.body.club_name),
         req.body.club_name,
         req.body.location,
@@ -51,24 +47,20 @@ app.post('/api/insertTeam', (req, res) => {
         id.uniqueID(req.body.stadium)
     ];
 
-    mysql.query(insertSQL, values, (err, result) => {
+    existingTeam.teamByID(req.body.club_name, teamExists => {
 
-        if (err) {
-            res.send({
-                "success":0,
-                "message":"Something went wrong."
+        if (!teamExists) {
+            mysql.query(insertSQL, values, (err, result) => {
+
+                if (err) throw err;
+                res.send({"isSuccess": 1, "message": "You have successfully inserted a new team."});
             });
-            throw err;
         }
         else {
-
-            res.setHeader('Content-Type', 'application/json');
-            res.send({
-                "success":1,
-                "message":"You have successfully inserted a new team."
-            });
+            res.send({"isSuccess": 0, "message": "A team with that name already exists."})
         }
     });
+
 });
 
 app.listen(3000, function() {
