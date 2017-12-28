@@ -5,10 +5,12 @@ const mysql = require('./database/databaseConnection');
 const id = require('./uniqueID/createUniqueID');
 const unixTime = require('./dateTime/dateTime');
 const existingTeam = require('./teamManager/teamManager');
+const stadiumAddress = require('./stadiumManager/stadiumManager.js');
 
 const app = express();
 
-var insertSQL = 'INSERT INTO club (club_id, club_name, location, league, manager, stadium, created_by, created_at, stadium_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+var insertClubSQL = 'INSERT INTO club (club_id, club_name, location, league, manager, stadium, created_by, created_at, stadium_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+var insertStadiumSQL = 'INSERT INTO stadium (stadium_id, stadium_name, stadium_address) VALUES (?, ?, ?)';
 var selectSQL = 'SELECT * FROM club WHERE club_id=?';
 
 app.use(bodyParser.json());
@@ -35,7 +37,7 @@ app.get('/api/team/:id', (req, res) => {
 
 app.post('/api/insertTeam', (req, res) => {
 
-    var values = [
+    var clubData = [
         id.uniqueID(req.body.club_name),
         req.body.club_name,
         req.body.location,
@@ -47,10 +49,24 @@ app.post('/api/insertTeam', (req, res) => {
         id.uniqueID(req.body.stadium)
     ];
 
+    const stadium = req.body.stadium + ', ' + req.body.location;
+
+    stadiumAddress.getStadiumAddress(stadium, address => {
+        const stadiumData = [
+            id.uniqueID(req.body.stadium),
+            req.body.stadium,
+            address
+        ];
+
+        mysql.query(insertStadiumSQL, stadiumData, (err, result) => {
+            if (err) throw err;
+        });
+    });
+
     existingTeam.teamByID(req.body.club_name, teamExists => {
 
         if (!teamExists) {
-            mysql.query(insertSQL, values, (err, result) => {
+            mysql.query(insertClubSQL, clubData, (err, result) => {
 
                 if (err) throw err;
                 res.send({"isSuccess": 1, "message": "You have successfully inserted a new team."});
