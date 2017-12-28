@@ -52,7 +52,7 @@ app.post('/api/insertTeam', (req, res) => {
     const stadium = req.body.stadium + ', ' + req.body.location;
 
     stadiumAddress.getStadiumAddress(stadium, address => {
-        var stadiumData = [
+        const stadiumData = [
             id.uniqueID(req.body.stadium),
             req.body.stadium,
             address
