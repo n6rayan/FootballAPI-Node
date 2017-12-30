@@ -1,0 +1,28 @@
+doctype html
+html(lang="en")
+    head
+        title Clubs
+        style
+            include css/table.css
+
+    body
+        h1 List of Clubs
+            
+        table
+            tr
+                th ID
+                th Name
+                th Location
+                th League
+                th Manager
+                th Stadium
+                th Author
+            for club in clubs
+                tr
+                    th=club.club_id
+                    th=club.club_name
+                    th=club.location
+                    th=club.league
+                    th=club.manager
+                    th=club.stadium
+                    th=club.created_by

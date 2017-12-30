@@ -1,0 +1,22 @@
+doctype html
+html(lang="en")
+    head
+        title Stadiums
+        style
+            include css/table.css
+
+    body
+        h1 List of Stadiums
+            
+        table
+            tr
+                th ID
+                th Club Name
+                th Stadium Name
+                th Address
+            for stadium in stadiums
+                tr
+                    th=stadium.stadium_id
+                    th=stadium.club_name
+                    th=stadium.stadium_name
+                    th=stadium.stadium_address
