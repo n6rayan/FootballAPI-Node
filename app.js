@@ -16,6 +16,22 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
+app.get('/clubs', (req, res) => {
+
+    team.getAllTeams(data => {
+
+        res.render('clubs', {clubs: data});
+    });
+});
+
+app.get('/stadiums', (req, res) => {
+
+    stadium.getAllStadiums(data => {
+
+        res.render('stadiums', {stadiums: data});
+    });
+});
+
 app.get('/api/team/:id', (req, res) => {
 
     team.teamByID(req.params.id, response => {

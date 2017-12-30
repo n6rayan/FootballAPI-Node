@@ -23,7 +23,7 @@ connection.connect(function (err) {
 
     var dbString;
 
-    info.devEnvironment ? dbString = 'Connected to development DB @ ' : dbString = 'Connected to producation DB @ ';
+    info.devEnvironment ? dbString = 'Connected to development DB @ ' : dbString = 'Connected to production DB @ ';
     console.log(dbString + Date());
 });
 

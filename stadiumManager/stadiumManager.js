@@ -4,7 +4,7 @@ const request = require('request');
 const insertStadiumSQL = 'INSERT INTO stadium SET ?';
 const selectSQL = 'SELECT * FROM stadium WHERE stadium_name=?';
 
-const selectStadiumSQL = 'SELECT stadium.stadium_id, club.club_name, stadium.stadium_name, stadium.stadium_address FROM stadium INNER JOIN club ON stadium.club_id=club.club_id AND stadium.stadium_id=?';
+const selectStadiumSQL = 'SELECT stadium.stadium_id, club.club_name, stadium.stadium_name, stadium.stadium_address FROM stadium INNER JOIN club ON stadium.club_id=club.club_id';
 
 function stadiumByName(name, callback) {
 
@@ -23,7 +23,7 @@ function stadiumByName(name, callback) {
 
 const stadiumByID = (id, callback) => {
 
-    mysql.query(selectStadiumSQL, id, (err, result) => {
+    mysql.query(selectStadiumSQL + ' AND stadium.stadium_id=?', id, (err, result) => {
 
         if (err) throw err;
 
@@ -32,6 +32,20 @@ const stadiumByID = (id, callback) => {
         }
         else {
             callback({"isSuccess": 0, "message": "Can't find a stadium based off that ID."});
+        }
+    });
+}
+
+const getAllStadiums = (callback) => {
+
+    mysql.query(selectStadiumSQL, (err, result) => {
+
+        console.log(result);
+
+        if (err) throw err;
+
+        if (result.length > 0) {
+            callback(result);
         }
     });
 }
@@ -49,7 +63,7 @@ const getStadiumAddress = (name, callback) => {
 
 const insertStadium = stadiumData => {
 
-    stadiumByID(stadiumData.stadium_name, stadiumExists => {
+    stadiumByName(stadiumData.stadium_name, stadiumExists => {
 
         if (!stadiumExists) {
             mysql.query(insertStadiumSQL, stadiumData, (err, result) => {
@@ -63,3 +77,4 @@ const insertStadium = stadiumData => {
 module.exports.insertStadium = insertStadium;
 module.exports.getStadiumAddress = getStadiumAddress;
 module.exports.stadiumByID = stadiumByID;
+module.exports.getAllStadiums = getAllStadiums;
