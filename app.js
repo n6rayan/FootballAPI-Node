@@ -34,7 +34,7 @@ app.get('/stadiums', (req, res) => {
 
 app.get('/api/team/:id', (req, res) => {
 
-    team.teamByID(req.params.id, response => {
+    team.teamByID(req.params.id, 1, response => {
 
         res.send(response);
     });
@@ -78,6 +78,22 @@ app.post('/api/insertTeam', (req, res) => {
         res.send(response);
     });
 
+});
+
+app.put('/api/updateTeam/:id', (req, res) => {
+
+    const clubData = {
+        club_name: req.body.club_name,
+        location: req.body.location,
+        league: req.body.league,
+        manager: req.body.manager,
+        stadium: req.body.stadium
+    };
+
+    team.updateTeam(clubData, req.params.id, response => {
+
+        res.send(response);
+    });
 });
 
 app.listen(3000, function() {
