@@ -3,6 +3,7 @@ const mysql = require('../database/databaseConnection');
 const insertClubSQL = 'INSERT INTO club SET ?';
 const selectSQL = 'SELECT * FROM club';
 const updateSQL = 'UPDATE club SET ? WHERE club_id=?';
+const deleteSQL = 'DELETE FROM club WHERE club_id=?';
 
 function teamByName(name, callback) {
 
@@ -48,7 +49,7 @@ const getAllTeams = (callback) => {
     });
 }
 
-const insertTeam = (clubData, callback) => {
+const insertTeam = (clubData, clubID, callback) => {
 
     teamByName(clubData.club_name, teamExists => {
 
@@ -56,7 +57,7 @@ const insertTeam = (clubData, callback) => {
             mysql.query(insertClubSQL, clubData, (err, result) => {
 
                 if (err) throw err;
-                callback({"isSuccess": 1, "message": "You have successfully inserted a new team."});
+                callback({"isSuccess": 1, "message": "You have successfully inserted a new team.", "clubID": clubID});
             });
         }
         else {
@@ -67,17 +68,33 @@ const insertTeam = (clubData, callback) => {
 
 const updateTeam = (data, id, callback) => {
 
-    mysql.query(updateSQL, [data, id], (err, result) => {
+    teamByID(id, 0, teamExists => {
 
-        teamByID(id, 0, teamExists => {
+        if (teamExists) {
+            mysql.query(updateSQL, [data, id], (err, result) => {
 
-            if (teamExists) {
-                callback({"isSuccess": 1, "message": "Team with ID of " + id + " has been updated"});
-            }
-            else {
-                callback({"isSuccess": 0, "message": "A team with that ID does not exist."});
-            }
-        });
+                callback({"isSuccess": 1, "message": "Team with ID of " + id + " has been updated."});
+            });
+        }
+        else {
+            callback({"isSuccess": 0, "message": "A team with that ID does not exist."});
+        }
+    });
+}
+
+const deleteTeam = (id, callback) => {
+
+    teamByID(id, 0, teamExists => {
+
+        if (teamExists) {
+            mysql.query(deleteSQL, id, (err, result) => {
+
+                callback({"isSuccess": 1, "message": "Team with ID of " + id + " has been deleted."});
+            });
+        }
+        else {
+            callback({"isSuccess": 0, "message": "A team with that ID does not exist."});
+        }
     });
 }
 
@@ -85,3 +102,4 @@ module.exports.insertTeam = insertTeam;
 module.exports.teamByID = teamByID;
 module.exports.getAllTeams = getAllTeams;
 module.exports.updateTeam = updateTeam;
+module.exports.deleteTeam = deleteTeam;

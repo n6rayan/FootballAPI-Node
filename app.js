@@ -42,7 +42,7 @@ app.get('/api/team/:id', (req, res) => {
 
 app.get('/api/stadium/:id', (req, res) => {
 
-    stadium.stadiumByID(req.params.id, response => {
+    stadium.stadiumByID(req.params.id, 1, response => {
 
         res.send(response);
     });
@@ -73,7 +73,7 @@ app.post('/api/insertTeam', (req, res) => {
         stadium.insertStadium(stadiumData);
     });
 
-    team.insertTeam(clubData, response => {
+    team.insertTeam(clubData, clubData.club_id, response => {
 
         res.send(response);
     });
@@ -91,6 +91,22 @@ app.put('/api/updateTeam/:id', (req, res) => {
     };
 
     team.updateTeam(clubData, req.params.id, response => {
+
+        res.send(response);
+    });
+});
+
+app.delete('/api/deleteTeam/:id', (req, res) => {
+
+    team.deleteTeam(req.params.id, response => {
+
+        res.send(response);
+    });
+});
+
+app.delete('/api/deleteStadium/:id', (req, res) => {
+
+    stadium.deleteStadium(req.params.id, response => {
 
         res.send(response);
     });
