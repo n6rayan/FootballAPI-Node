@@ -3,6 +3,7 @@ const request = require('request');
 
 const insertStadiumSQL = 'INSERT INTO stadium SET ?';
 const selectSQL = 'SELECT * FROM stadium WHERE stadium_name=?';
+const deleteSQL = 'DELETE FROM stadium WHERE stadium_id=?';
 
 const selectStadiumSQL = 'SELECT stadium.stadium_id, club.club_name, stadium.stadium_name, stadium.stadium_address FROM stadium INNER JOIN club ON stadium.club_id=club.club_id';
 
@@ -21,17 +22,19 @@ function stadiumByName(name, callback) {
     });
 }
 
-const stadiumByID = (id, callback) => {
+const stadiumByID = (id, use, callback) => {
 
     mysql.query(selectStadiumSQL + ' AND stadium.stadium_id=?', id, (err, result) => {
 
         if (err) throw err;
 
         if (result.length > 0) {
-            callback(result);
+            if (use) callback(result);
+            if (!use) callback(true);
         }
         else {
-            callback({"isSuccess": 0, "message": "Can't find a stadium based off that ID."});
+            if (use) callback({"isSuccess": 0, "message": "Can't find a stadium based off that ID."});
+            if (!use) callback(false);
         }
     });
 }
@@ -39,8 +42,6 @@ const stadiumByID = (id, callback) => {
 const getAllStadiums = (callback) => {
 
     mysql.query(selectStadiumSQL, (err, result) => {
-
-        console.log(result);
 
         if (err) throw err;
 
@@ -74,7 +75,24 @@ const insertStadium = stadiumData => {
     });
 }
 
+const deleteStadium = (id, callback) => {
+
+    stadiumByID(id, 0, stadiumExists => {
+
+        if (stadiumExists) {
+            mysql.query(deleteSQL, id, (err, result) => {
+
+                callback({"isSuccess": 1, "message": "Stadium with ID of " + id + " has been deleted."});
+            });
+        }
+        else {
+            callback({"isSuccess": 0, "message": "A stadium with that ID does not exist."});
+        }
+    });
+}
+
 module.exports.insertStadium = insertStadium;
 module.exports.getStadiumAddress = getStadiumAddress;
 module.exports.stadiumByID = stadiumByID;
 module.exports.getAllStadiums = getAllStadiums;
+module.exports.deleteStadium = deleteStadium;
